@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "export_choir"
+version = "0.1.0"
+description = "Exports a MIDI file to one MIDI file for each voice"
+authors = ["Jan van Mansum <janvanmansum@gmail.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mido = "^1.2.9"
+pyyaml = "^6.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+create-practise-midis = "export_choir:main"
