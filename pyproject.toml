@@ -18,3 +18,5 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 create-practise-midis = "export_choir:main"
+convert-midi-to-mp3 = "convert_to_mp3:main"
+
