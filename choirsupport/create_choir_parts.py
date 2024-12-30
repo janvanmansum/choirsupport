@@ -1,8 +1,13 @@
 import argparse
+import logging
 import os.path
-from copy_midi import copy_midi2, find_track_by_name
+
+from choirsupport.common import init
+from choirsupport.copy_midi import copy_midi2, find_track_by_name
 import yaml
 from mido import MidiFile
+
+from choirsupport.instruments import MIDI_INSTRUMENTS
 
 
 def load_settings(input_file):
@@ -52,6 +57,7 @@ def get_default_volume_for_part(part, settings):
 
 
 def main():
+    config = init()
     parser = argparse.ArgumentParser(description="Export choir parts with customized volumes and instruments",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("input_midi", help="Input MIDI file")
@@ -63,32 +69,18 @@ def main():
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    settings = load_settings(args.input_midi)
+    settings = {**config, **load_settings(args.input_midi)}
 
-    women = {
-        'Soprano': 'S1',
-        'Mezzo-soprano': 'S2',
-        'Alto': 'A',
-        'Alto 1': 'A1',
-        'Alto 2': 'A2'
-    }
-
-    men = {
-        'Tenor': 'T',
-        'Tenor 1': 'T1',
-        'Tenor 2': 'T2',
-        'Baritone': 'Bar',
-        'Bass': 'B'
-    }
-
+    women = config['women_voices']
+    men = config['men_voices']
     voices = {**women, **men}
     instruments = {}
 
     for v in women:
-        instruments[v] = 53
+        instruments[v] = MIDI_INSTRUMENTS[settings['women_instrument']]
 
     for v in men:
-        instruments[v] = 52
+        instruments[v] = MIDI_INSTRUMENTS[settings['men_instrument']]
 
     volumes = {}
 
@@ -96,7 +88,7 @@ def main():
         print("Setting volume for {} to {}".format(v, settings['volumes']['default']))
         volumes[v] = get_default_volume_for_part(v, settings)
 
-    # Set default volumes for special instruments
+    # Set default volumes for special instruments.py
     volumes['Piano'] = settings['volumes']['piano']
     volumes['Wood Blocks'] = settings['volumes']['wood_blocks']
 

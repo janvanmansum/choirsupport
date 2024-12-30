@@ -1,0 +1,65 @@
+# Women's voices and there abbreviations
+women_voices:
+  Soprano: S1
+  Mezzo-soprano: S2
+  Alto: A1
+  Alto 1: A1
+  Alto 2: A2
+
+# Men's voices and there abbreviations
+men_voices:
+  Tenor: T
+  Tenor 1: T1
+  Tenor 2: T2
+  Baritone: Bar
+  Bass: B
+
+women_instrument: "Voice Oohs"
+men_instrument: "Choir Aahs"
+
+# Volumes, or "velocity" of various instruments.py (0-127)
+volumes:
+  # The part for which the practice part is being generated. It should be louder than the other parts.
+  part: 127
+  # The 'play-along' piano part; it has the same notes as the part.
+  part_piano: 127
+  # The volume of the accompanying piano part, if any
+  piano: 110
+  # The volume for the other voices in the choir
+  default: 50
+  # The wood block part, which can simulate a metronome
+  wood_blocks: 70
+  # The volume for all voices in the SATB version of the piece
+  satb: 100
+
+# Uncomment this if the default volumes need to be overridden for a specific voice. This can be the case if a voice
+# stands out too much, for example the soprano voice, which often dominates because of its higher pitch, or when a voice
+# is split into two parts, like the Alto 1 and Alto 2 voices, and other voices are not.
+
+# default_override:
+#     Soprano: 20
+
+# The soundfont to use when generating the wav file. If not set, the default soundfont will be used.
+soundfont:
+
+logging:
+  version: 1
+  loggers:
+    choirsupport:
+      level: DEBUG
+      handlers: [file, console]
+  handlers:
+    file:
+      class: logging.FileHandler
+      level: DEBUG
+      filename: "%HOME%/choirsupport.log"
+      formatter: detailed
+    console:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: detailed
+  formatters:
+    detailed:
+      format: "%(asctime)s [%(levelname)s] %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+

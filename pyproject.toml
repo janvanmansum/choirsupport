@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "export_choir"
-version = "0.1.0"
+name = "choirsupport"
+version = "0.2.0"
 description = "Exports a MIDI file to one MIDI file for each voice"
 authors = ["Jan van Mansum <janvanmansum@gmail.com>"]
 license = "Apache 2.0"
@@ -17,6 +17,6 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-create-practise-midis = "export_choir:main"
-convert-midi-to-mp3 = "convert_to_mp3:main"
+create-choir-parts = "choirsupport.create_choir_parts:main"
+convert-to-mp3 = "choirsupport.convert_to_mp3:main"
 

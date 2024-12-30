@@ -1,9 +1,12 @@
+import logging
 import os
 import subprocess
-import sys
+import argparse
 
-def convert_midi_to_mp3(input_midi, output_dir):
-    soundfont = "/home/janvanmansum/Music/Koor/ms_basic.sf3"
+from choirsupport.common import init
+
+
+def convert_midi_to_mp3(input_midi: str, output_dir: str, soundfont: str = None):
     output_wav = os.path.join(output_dir, os.path.basename(input_midi).replace('.mid', '.wav'))
     output_mp3 = os.path.join(output_dir, os.path.basename(input_midi).replace('.mid', '.mp3'))
 
@@ -16,15 +19,17 @@ def convert_midi_to_mp3(input_midi, output_dir):
     # Remove the intermediate WAV file
     os.remove(output_wav)
 
+
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python convert_to_mp3.py <input_midi> <output_dir>")
-        sys.exit(1)
+    config = init()
+    logging.debug("Initialized configuration")
+    parser = argparse.ArgumentParser(description="Convert MIDI files to MP3.")
+    parser.add_argument('input_midi', type=str, help='The input MIDI file')
+    parser.add_argument('output_dir', type=str, help='The output directory')
 
-    input_midi = sys.argv[1]
-    output_dir = sys.argv[2]
+    args = parser.parse_args()
 
-    convert_midi_to_mp3(input_midi, output_dir)
+    convert_midi_to_mp3(args.input_midi, args.output_dir, config['soundfont'])
 
 
 if __name__ == "__main__":
