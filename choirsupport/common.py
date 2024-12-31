@@ -8,6 +8,7 @@ from yaml import safe_load
 configuration_file = '~/.choirsupport.yml'
 example_configuration_file = 'example-config.yml'
 
+
 def ensure_configuration_file_exists():
     if not exists(expanduser(configuration_file)):
         print("No %s found; instantiating..." % configuration_file)
@@ -30,3 +31,13 @@ def init():
         log = logging.getLogger(__name__)
         log.info("Initialized logging")
         return config
+
+
+def recursive_merge(d1: dict, d2: dict):
+    result = d1.copy()
+    for key, value in d2.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = recursive_merge(result[key], value)
+        else:
+            result[key] = value
+    return result

@@ -22,7 +22,7 @@ ffmpeg zet de WAV-bestanden om naar mp3-bestanden. Beide programma's zijn gratis
 Choirsupport helpt enkel bij het maken van oefenbestanden voor alle koorpartijen. Het gaat ervan uit dat er een master
 MIDI-bestand is met alle partijen. Dit bestand kun je maken met een programma zoals [MuseScore]. Maak hierin de
 partituur met alle partijen en exporteer deze naar een MIDI-bestand. Gebruik vervolgens het volgende commando om de
-oefenbestanden te maken:
+oefenbestanden te maken (`master.mid` en `output-dir` zijn voorbeelden):
 
 ```shell
 create-choir-parts master.mid output-dir

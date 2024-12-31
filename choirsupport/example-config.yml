@@ -17,7 +17,7 @@ men_voices:
 women_instrument: "Voice Oohs"
 men_instrument: "Choir Aahs"
 
-# Volumes, or "velocity" of various instruments.py (0-127)
+# Main volumes of the various tracks (0-127)
 volumes:
   # The part for which the practice part is being generated. It should be louder than the other parts.
   part: 127

@@ -1,11 +1,18 @@
 import argparse
+import logging
 import os.path
 
 from mido import MidiFile, MidiTrack, MetaMessage, Message
 
+channel_msg_types = ['note_on', 'note_off', 'control_change', 'polytouch', 'pitchwheel', 'aftertouch']
+
+
+def log():
+    return logging.getLogger(__name__)
+
 
 def copy_track(track, new_instrument=None, new_volume=None):
-    print(f"  Track Name: {track.name}")
+    log().debug("Copying track %s with new_instrument = %s, new_volume = %s", track.name, new_instrument, new_volume)
     new_track = MidiTrack()
     for msg in track:
         if msg.type == 'program_change' and new_instrument is not None:
@@ -17,8 +24,9 @@ def copy_track(track, new_instrument=None, new_volume=None):
     return new_track
 
 
-def copy_track2(track, new_name, new_instrument=None, new_volume=None, new_channel=None):
-    print(f"  Track Name: {track.name}")
+def copy_track_to_new_channel(track, new_name, new_instrument=None, new_volume=None, new_channel=None):
+    log().debug("Copying track %s with new_name = %s, new_instrument = %s, new_volume = %s, new_channel = %s",
+                track.name, new_name, new_instrument, new_volume, new_channel)
     new_track = MidiTrack()
     new_track.append(MetaMessage('track_name', name=new_name, time=0))
     for msg in track:
@@ -26,50 +34,51 @@ def copy_track2(track, new_name, new_instrument=None, new_volume=None, new_chann
             new_track.append(msg.copy(program=new_instrument, channel=new_channel))
         elif msg.type == 'control_change' and msg.control == 7 and new_volume is not None:
             new_track.append(msg.copy(value=new_volume, channel=new_channel))
-        elif msg.type in ['note_on', 'note_off', 'control_change', 'polytouch', 'pitchwheel', 'aftertouch']:
+        elif msg.type in channel_msg_types:
             new_track.append(msg.copy(channel=new_channel))
         else:
             new_track.append(msg.copy())
     return new_track
 
 
-def copy_midi2(midi: MidiFile, output_file: str, instruments: dict, volumes: dict, extra_track=None):
+def copy_midi(midi: MidiFile, instruments: dict, volumes: dict, extra_track=None):
     new_midi = MidiFile()
 
     for i, track in enumerate(midi.tracks):
         instrument = None
         if track.name in instruments:
-            print(f"Changing instrument of track {track.name} to  {instruments[track.name]}")
+            log().debug(f"Changing instrument of track {track.name} to  {instruments[track.name]}")
             instrument = instruments[track.name]
         volume = None
         if track.name in volumes:
-            print(f"Changing volume of track {track.name} to {volumes[track.name]}")
+            log().debug(f"Changing volume of track {track.name} to {volumes[track.name]}")
             volume = volumes[track.name]
         new_midi.tracks.append(copy_track(track, instrument, volume))
 
     if extra_track is not None:
-        print(f"Adding extra track: {extra_track['name']}")
+        log().debug(f"Adding extra track: {extra_track['name']}")
         new_midi.tracks.append(
-            copy_track2(track=find_track_by_name(new_midi, extra_track['melody_from']),
-                        new_name=extra_track['name'],
-                        new_instrument=extra_track['instrument'],
-                        new_volume=extra_track['volume'],
-                        new_channel=find_unused_channel(new_midi)))
+            copy_track_to_new_channel(track=find_track_by_name(new_midi, extra_track['melody_from']),
+                                      new_name=extra_track['name'],
+                                      new_instrument=extra_track['instrument'],
+                                      new_volume=extra_track['volume'],
+                                      new_channel=find_unused_channel(midi)))
+    return new_midi
 
-    new_midi.save(output_file)
-    print(f"Saved as: {output_file}")
 
-def copy_midi(input_file: str, output_file: str, instruments: dict, volumes: dict, extra_track=None):
-    print(f"Input file: {input_file}")
+def copy_midi_file(input_file: str, output_file: str, instruments: dict, volumes: dict, extra_track=None):
+    log().debug(f"Input file: {input_file}")
     midi = MidiFile(input_file)
-    copy_midi2(midi, output_file, instruments, volumes, extra_track)
+    midi_copy = copy_midi(midi, instruments, volumes, extra_track)
+    midi_copy.save(output_file)
+    log().info("Saved MIDI file to %s", output_file)
 
 
 def find_unused_channel(midi):
     channels = set(range(16))
     for track in midi.tracks:
         for msg in track:
-            if msg.type in ['note_on', 'note_off']:
+            if msg.type in channel_msg_types:
                 channels.discard(msg.channel)
     return channels.pop() if channels else None
 
@@ -88,7 +97,7 @@ def main():
     parser.add_argument('output_file', help='Output MIDI file')
     args = parser.parse_args()
 
-
+    # TODO: Make these configurable
     instruments = {
         'Soprano': 53,
         'Mezzo-soprano': 53,
@@ -125,8 +134,8 @@ def main():
         'melody_from': 'Bass'
     }
 
-    copy_midi(os.path.expanduser(args.input_file), os.path.expanduser(args.output_file), instruments, volumes,
-              extra_track)
+    copy_midi_file(os.path.expanduser(args.input_file), os.path.expanduser(args.output_file), instruments, volumes,
+                   extra_track)
 
 
 if __name__ == '__main__':
