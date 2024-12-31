@@ -11,7 +11,8 @@ def convert_midi_to_mp3(input_midi: str, output_dir: str, soundfont: str = None)
     output_mp3 = os.path.join(output_dir, os.path.basename(input_midi).replace('.mid', '.mp3'))
 
     # Render MIDI to WAV
-    subprocess.run(['fluidsynth', '-ni', soundfont, input_midi, '-F', output_wav, '-r', '44100'], check=True)
+    # TODO: Make the gain configurable
+    subprocess.run(['fluidsynth', '-ni', '-g 0.5', soundfont, input_midi, '-F', output_wav, '-r', '44100'], check=True)
 
     # Convert WAV to MP3 using ffmpeg
     subprocess.run(['ffmpeg', '-y', '-i', output_wav, output_mp3], check=True)
@@ -29,7 +30,22 @@ def main():
 
     args = parser.parse_args()
 
-    convert_midi_to_mp3(args.input_midi, args.output_dir, config['soundfont'])
+    input_midi = args.input_midi
+    output_dir = os.path.expanduser(args.output_dir)
+
+    # Check if input_midi exists
+    if not os.path.exists(input_midi):
+        # Process all parts
+        input_dir = os.path.dirname(input_midi)
+        basename = os.path.basename(input_midi)
+        for root, _, files in os.walk(input_dir):
+            for file in files:
+                if file.startswith(basename) and file.endswith('.mid'):
+                    full_path = os.path.join(root, file)
+                    convert_midi_to_mp3(full_path, output_dir, config['soundfont'])
+    else:
+        # Process the single file
+        convert_midi_to_mp3(input_midi, output_dir, config['soundfont'])
 
 
 if __name__ == "__main__":

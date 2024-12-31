@@ -95,7 +95,7 @@ def main():
     # Set default volumes for special tracks
     volumes['Piano'] = settings['volumes']['piano']
     # Work-around for problem in MuseScore (not possible to rename tracks)
-    volumes['Piano 2'] = settings['volumes']['piano'] 
+    volumes['Piano 2'] = settings['volumes']['piano']
     volumes['Wood Blocks'] = settings['volumes']['wood_blocks']
 
     input_midi = os.path.expanduser(args.input_midi)
