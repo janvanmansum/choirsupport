@@ -76,8 +76,8 @@ def main():
 
     settings = recursive_merge(config, load_settings(args.input_midi))
 
-    women = config['women_voices']
-    men = config['men_voices']
+    women = settings['women_voices']
+    men = settings['men_voices']
     voices = {**women, **men}
     instruments = {}
 
