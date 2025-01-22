@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "choirsupport"
-version = "0.5.0"
+version = "0.6.0"
 description = "Exports a MIDI file to one MIDI file for each voice"
 authors = ["Jan van Mansum <janvanmansum@gmail.com>"]
 license = "Apache 2.0"
